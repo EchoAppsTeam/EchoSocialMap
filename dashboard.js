@@ -46,7 +46,7 @@ dashboard.config.ecl = [{
 			"input": {
 				"data": {"rules": ['streamserver.add-markers:"geo.location:${geo.longitude};${geo.latitude},geo.marker" | geo']}
 			}
-		}		
+		}
 	}
 }, {
 	"component": "Group",

@@ -23,6 +23,7 @@
 	"globals": {
 		"Echo": false,
 		"Backplane": false,
-		"janrain": false
+		"janrain": false,
+		"L": false
 	}
 }

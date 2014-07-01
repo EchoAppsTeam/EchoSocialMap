@@ -44,9 +44,8 @@ socialmap.config = {
 
 socialmap.dependencies = [
 	{"url": "{config:cdnBaseURL.sdk}/api.pack.js", "control": "Echo.StreamServer.API"},
-	// TODO: substitute with proper domains/paths
-	{"url": "http://echoplatform.com/sandbox/apps/social-map/third-party/leaflet.css"},
-	{"url": "http://echoplatform.com/sandbox/apps/social-map/third-party/leaflet.js"}
+	{"url": "{%= baseURLs.prod %}/third-party/leaflet.css"},
+	{"url": "{%= baseURLs.prod %}/third-party/leaflet.js"}
 ];
 
 socialmap.init = function() {
@@ -85,8 +84,7 @@ socialmap.methods._assembleQuery = function() {
 };
 
 socialmap.methods._loadGeoJSON = function(visualization, callback) {
-	// TODO: substitute with proper domains/paths
-	var url = "http://echoplatform.com/sandbox/apps/social-map/third-party/geo." + visualization + ".js";
+	var url = "{%= baseURLs.prod %}/third-party/geo." + visualization + ".js";
 	Echo.Loader.download([{"url": url}], callback);
 };
 
@@ -126,7 +124,7 @@ socialmap.methods._requestData = function() {
 			app._renderMap();
 			app._renderPins(data);
 			app.ready();
-		}		
+		}
 	});
 	this.request.send();
 };
@@ -232,9 +230,9 @@ socialmap.methods._renderPin = function(latlng, entry) {
 		// remove marker as soon as an animation is over to avoid memory leaks
 		setTimeout(function() {
 			map.removeLayer(marker);
-		}, parseInt(app.config.get("presentation.pinFadeOutSpeed")));
+		}, parseInt(app.config.get("presentation.pinFadeOutSpeed"), 10));
 
-	}, parseInt(app.config.get("presentation.pinDisplayTime")));
+	}, parseInt(app.config.get("presentation.pinDisplayTime"), 10));
 };
 
 socialmap.methods._renderMap = function() {
