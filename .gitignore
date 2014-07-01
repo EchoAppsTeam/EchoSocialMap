@@ -1,0 +1,8 @@
+web/*
+
+node_modules
+npm-debug.log
+
+config/environments/development.json
+config/environments/test.json
+config/release.json

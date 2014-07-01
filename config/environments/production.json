@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"manifest": {
+		"id": "echo-social-map",
+		"name": "Social Map"
+	},
+	"baseURLs": {
+		"dev":  "//cdn.echoenabled.com/apps/echo/social-map/v{%=packageVersions.stable%}/dev",
+		"prod": "//cdn.echoenabled.com/apps/echo/social-map/v{%=packageVersions.stable%}"
+	}
+}

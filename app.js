@@ -1,0 +1,299 @@
+// docs: http://leafletjs.com/reference.html
+(function($) {
+"use strict";
+
+var socialmap = Echo.App.manifest("Echo.Apps.SocialMap");
+
+if (Echo.App.isDefined(socialmap)) return;
+
+socialmap.vars = {
+	"events": [],   // events queue to maintain up to 50 last seen events
+			// to make a map feel real-time in case of slow incoming
+			// data rate
+
+	"lastSeenEventAt": undefined
+};
+
+socialmap.config = {
+	"targetURL": undefined,
+	"viewportChangeTimeout": 50,
+	"presentation": {
+		"visualization": "us",
+		"mapColor": "#D8D8D8",
+		"pinBodyColor": "#3C3C3C",
+		"pinBorderColor": "#3C3C3C",
+		"pinShowSpeed": "100",
+		"pinFadeOutSpeed": "2000",
+		"pinDisplayTime": "5000",
+		"pinDefaultSize": 8 // in px, pin size at 1x map scale
+	},
+	"dependencies": {
+		"StreamServer": {
+			"appkey": undefined,
+			"apiBaseURL": "//api.echoenabled.com/v1/",
+			"liveUpdates": {
+				"transport": "websockets",
+				"enabled": true,
+				"websockets": {
+					"URL": "//live.echoenabled.com/v1/"
+				}
+			}
+		}
+	}
+};
+
+socialmap.dependencies = [
+	{"url": "{config:cdnBaseURL.sdk}/api.pack.js", "control": "Echo.StreamServer.API"},
+	// TODO: substitute with proper domains/paths
+	{"url": "http://echoplatform.com/sandbox/apps/social-map/third-party/leaflet.css"},
+	{"url": "http://echoplatform.com/sandbox/apps/social-map/third-party/leaflet.js"}
+];
+
+socialmap.init = function() {
+	var app = this;
+
+	// check for "targetURL" field, without
+	// this field we are unable to retrieve any data
+	if (!this.config.get("targetURL")) {
+		this.showMessage({
+			"type": "error",
+			"message": "Unable to retrieve data, target URL is not specified."
+		});
+		return;
+	}
+
+	var map = this.config.get("presentation.visualization");
+	this._loadGeoJSON(map, function() {
+		// save reference to GEO data object
+		app.set("geo", Echo.Variables.GEO[app.config.get("presentation.visualization")]);
+		app._requestData();
+	});
+};
+
+socialmap.destroy = function() {
+	$(window).off("resize", this._viewportResizeHandler);
+};
+
+socialmap.templates.main =
+	'<div class="{class:container}">' +
+		'<div class="{class:map}"></div>' +
+	'</div>';
+
+socialmap.methods._assembleQuery = function() {
+	return "childrenof:" + this.config.get("targetURL") +
+		" itemsPerPage:50 markers:geo.marker children markers:geo.marker";
+};
+
+socialmap.methods._loadGeoJSON = function(visualization, callback) {
+	// TODO: substitute with proper domains/paths
+	var url = "http://echoplatform.com/sandbox/apps/social-map/third-party/geo." + visualization + ".js";
+	Echo.Loader.download([{"url": url}], callback);
+};
+
+socialmap.methods._requestData = function() {
+	var app = this;
+	var ssConfig = this.config.get("dependencies.StreamServer");
+	this.request = Echo.StreamServer.API.request({
+		"endpoint": "search",
+		"secure": this.config.get("useSecureAPI"),
+		"apiBaseURL": ssConfig.apiBaseURL,
+		"data": {
+			"q": this._assembleQuery(),
+			"appkey": ssConfig.appkey
+		},
+		"liveUpdates": $.extend(ssConfig.liveUpdates, {
+                        "onData": function(data) {
+				app._renderPins(data);
+                        }
+                }),
+                "onError": function(data, options) {
+			var isCriticalError =
+				typeof options.critical === "undefined" ||
+				options.critical && options.requestType === "initial";
+
+			if (isCriticalError) {
+				app.showError(data, $.extend(options, {
+					"request": app.request
+				}));
+			}
+		},
+		"onData": function(data, options) {
+			app.render();
+			// we need to wait until the "render" function is executed
+			// for elements to be appended into the DOM tree and be
+			// laid out by the browser. Otherwise it wouldn't have a
+			// width/height yet and Leaflet does NOT like that
+			app._renderMap();
+			app._renderPins(data);
+			app.ready();
+		}		
+	});
+	this.request.send();
+};
+
+socialmap.methods._extractGeoLocationInfo = function(entry) {
+	var latlng;
+	// A geo-location marker looks like this,
+	// using the standard rule in DataServer:
+	//    geo.location:-117.57980013;33.46756302
+	$.map(entry.object.markers || [], function(marker) {
+		if (!/^geo.location:/.test(marker)) return;
+		var parts = marker.split(":")[1].split(";");
+		latlng = [parseFloat(parts[1]), parseFloat(parts[0])];
+	});
+	return latlng;
+};
+
+socialmap.methods._getPinTransitionCSS = function(transform, duration) {
+	var prefixes = ["-o-", "-ms-", "-webkit-", "-moz-", ""];
+	return Echo.Utils.foldl({}, prefixes, function(prefix, acc) {
+		acc[prefix + "transition-timing-function"] = "ease-out";
+		acc[prefix + "transition-duration"] = duration + "ms";
+		acc[prefix + "transform"] = transform;
+	});
+};
+
+socialmap.methods._log2 = function(value) {
+	return Math.log2 ? Math.log2(value) : (Math.log(value) / Math.log(2));
+};
+
+socialmap.methods._getMapZoom = function(mapWidth) {
+	var baseWidth = this.get("geo.defaultSize")[0];
+	// note: adding 0.8 to start with 1x scale (vs 0x),
+	//       adding 0.8, not 1 to fit map on a screen
+	//       and center it (making zoom a bit smaller)
+	return parseFloat((this._log2(mapWidth / baseWidth) + 0.8).toFixed(2));
+};
+
+socialmap.methods._getMapHeight = function(mapWidth) {
+	var defaultSize = this.get("geo.defaultSize");
+	// we get width/height proportion for default size and calculate
+	// the necessary height using it, according to the given width
+	return Math.round(mapWidth / (defaultSize[0] / defaultSize[1]));
+};
+
+socialmap.methods._renderPins = function(data) {
+	if (!data.entries || !data.entries.length) return;
+
+	var app = this;
+
+	// gather valid (with geo data) pins only
+	var pins = Echo.Utils.foldl([], data.entries, function(entry, acc) {
+		var loc = app._extractGeoLocationInfo(entry);
+		if (loc) {
+			acc.push([loc, entry]);
+		}
+	});
+
+	// TODO: work out algorithm to display pins..
+	var cur = 0;
+	var interval = setInterval(function() {
+		var pin = pins[cur];
+		cur++;
+		if (cur > pins.length) clearInterval(interval);
+
+		if (pin) app._renderPin(pin[0], pin[1]);
+	}, 1000);
+};
+
+socialmap.methods._renderPin = function(latlng, entry) {
+	var app = this,
+		map = app.get("map"),
+		pinSize = app.get("zoom") * app.config.get("presentation.pinDefaultSize");
+
+	var icon = L.divIcon({
+		"className": "echo-apps-socialmap-pin",
+		"iconSize": [pinSize, pinSize]
+	});
+	var marker = L.marker(latlng, {"icon": icon, "opacity": 1}).addTo(map);
+
+	var pinCSS = $.extend({
+		"opacity": "0.5",
+		"border-radius": "50%", // make it a cirlce
+		"background": app.config.get("presentation.pinBodyColor"),
+		"border": "1px solid " + app.config.get("presentation.pinBorderColor"),
+		"width": pinSize,
+		"height": pinSize
+	}, app._getPinTransitionCSS("scale(0)", "0"));
+	var circle = $('<div class="echo-apps-socialmap-marker"></div>').css(pinCSS);
+	$(marker._icon).append(circle);
+
+	// timeout is used to init CSS transition
+	setTimeout(function() {
+		var duration = app.config.get("presentation.pinShowSpeed");
+		circle.css(app._getPinTransitionCSS("scale(1)", duration));
+	}, 50);
+
+	// wait a given number of ms and fade out
+	setTimeout(function() {
+		var duration = app.config.get("presentation.pinFadeOutSpeed");
+		circle.css(app._getPinTransitionCSS("scale(0)", duration));
+
+		// remove marker as soon as an animation is over to avoid memory leaks
+		setTimeout(function() {
+			map.removeLayer(marker);
+		}, parseInt(app.config.get("presentation.pinFadeOutSpeed")));
+
+	}, parseInt(app.config.get("presentation.pinDisplayTime")));
+};
+
+socialmap.methods._renderMap = function() {
+	var app = this,
+		map,
+		mapView = app.view.get("map"),
+		timeout = app.config.get("viewportChangeTimeout");
+
+	var _viewportResizeHandler = function() {
+		var width = mapView.width();
+		var zoom = app._getMapZoom(width);
+		app.set("zoom", zoom);
+		mapView.height(app._getMapHeight(width));
+		if (map) {
+			map.setView(app.get("geo.center"), zoom, {"reset": true});
+		}
+	};
+
+	// store debounced version of the function
+	this._viewportResizeHandler = Echo.Utils.debounce(_viewportResizeHandler, timeout);
+
+	// trigger zoom/height calculations
+	_viewportResizeHandler();
+
+	$(window).bind("resize", this._viewportResizeHandler);
+
+	// more information on the options below can be found
+	// on Leaflet docs: http://leafletjs.com/reference.html
+	map = new L.map(mapView.get(0), {
+		"center": app.get("geo.center"),
+		"zoom": app.get("zoom"),
+		"minZoom": 0.1,
+		"maxZoom": 5,
+		"dragging": false,
+		"touchZoom": false,
+		"scrollWheelZoom": false,
+		"doubleClickZoom": false,
+		"boxZoom": false,
+		"keyboard": false,
+		"zoomControl": false,
+		"trackResize": true,
+		"attributionControl": false
+	});
+	L.geoJson(this.get("geo.json"), {
+		"style": {
+			"fillColor": app.config.get("presentation.mapColor"),
+			"fillOpacity": 1,
+			"stroke": true,
+			"color": "#FFFFFF",
+			"weight": 1,
+			"opacity": 1
+		}
+	}).addTo(map);
+
+        app.set("map", map);
+};
+
+socialmap.css = '.{class} .{class:map} { width: 100%; min-width: 300px; background: inherit; }';
+
+Echo.App.create(socialmap);
+
+})(Echo.jQuery);

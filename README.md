@@ -29,4 +29,4 @@ You can see the demo page of Echo Social Mapp app [here](http://echoappsteam.git
 
 And here is the screenshot:
 
-![Echo Social Map](http://static.squarespace.com/static/52c5b81de4b0494603ede7e5/t/52f3d840e4b0bdba1c1766b5/1391712332640/conversations-overview.png?format=500w "Echo Social Map Screenshot")
+![Echo Social Map](http://static.squarespace.com/static/52c5b81de4b0494603ede7e5/t/52f3d840e4b0bdba1c1766b5/1391712332640/conversations-overview.png?format=650w "Echo Social Map Screenshot")

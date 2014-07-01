@@ -1,0 +1,37 @@
+{
+	"id": "{%=manifest.id%}",
+	"name": "{%=manifest.name%}",
+	"description": "Allows you to easily collect chatter from the Social Web and visualize it on a map in real-time.",
+	"app_version": "{%=packageVersions.stable%}",
+	"icon": "{%=baseURLs.prod%}/images/icon.png",
+	"developer": {
+		"id": "echo",
+		"name": "Echo",
+		"url": "http://www.aboutecho.com",
+		"email": "solutions@aboutecho.com",
+		"icon": "http://cdn.echoenabled.com/images/echo.png"
+	},
+	"dashboards": [{
+		"id": "instances",
+		"type": "instances",
+		"title": "Instances",
+		"script": "{%=baseURLs.prod%}/dashboard.js",
+		"component": "Echo.Apps.SocialMap.Dashboard",
+		"config": {
+			"instanceManager": {
+				"instance": {"useLoadingIcon": true}
+			},
+			"appkeys": "{data:apps.streamserver.appkeys}",
+			"customer": "{data:customer}",
+			"domains": "{data:apps.streamserver.domains}"
+		}
+	}],
+	"client_widget": {
+		"component": "Echo.Apps.SocialMap",
+		"scripts": {
+			"dev": "{%=baseURLs.dev%}/app.js",
+			"prod": "{%=baseURLs.prod%}/app.js"
+		}
+	},
+	"cloudapp_protocol_version": "1.0.0"
+}

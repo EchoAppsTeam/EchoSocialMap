@@ -1,0 +1,39 @@
+{
+  "name": "echo-social-map",
+  "description": "Echo Social Map app",
+  "version": "1.0.0",
+  "author": {
+    "name": "Echo",
+    "url": "http://aboutecho.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/EchoAppsTeam/EchoSocialMap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EchoAppsTeam/EchoSocialMap/issues"
+  },
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "engines": {
+    "node": ">=0.8"
+  },
+  "dependencies": {
+    "grunt": "~0.4.2",
+    "sphere": "~0.1.0",
+    "lodash": "~2.4.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.5",
+    "grunt-contrib-jshint": "~0.7.1"
+  },
+  "devDependencies": {
+    "grunt-contrib-watch": "~0.5.3"
+  },
+  "private": true
+}
