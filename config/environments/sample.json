@@ -4,5 +4,8 @@
 		"id": "",
 		"name": ""
 	},
-	"baseURL": ""
+	"baseURLs": {
+		"dev": "",
+		"prod": ""
+	}
 }
