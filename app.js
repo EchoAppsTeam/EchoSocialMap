@@ -230,9 +230,9 @@ socialmap.methods._renderPin = function(latlng, entry) {
 		// remove marker as soon as an animation is over to avoid memory leaks
 		setTimeout(function() {
 			map.removeLayer(marker);
-		}, parseInt(app.config.get("presentation.pinFadeOutSpeed"), 10));
+		}, parseInt(app.config.get("presentation.pinFadeOutSpeed")));
 
-	}, parseInt(app.config.get("presentation.pinDisplayTime"), 10));
+	}, parseInt(app.config.get("presentation.pinDisplayTime")));
 };
 
 socialmap.methods._renderMap = function() {
