@@ -125,6 +125,15 @@ dashboard.config.ecl = [{
 			"title": "Pin display duration",
 			"desc": "Specifies the time which the pin remains on the map (in milliseconds)"
 		}
+	}, {
+		"component": "Checkbox",
+		"name": "renderHistoricalData",
+		"type": "boolean",
+		"default": true,
+		"config": {
+			"title": "Render historical pins",
+			"desc": "Specifies if items (pins) posted before a page was opened should be displayed on the map. If set to 'No', only new pins will be displayed on the map as they come in."
+		}
 	}]
 }, {
 	"component": "Group",

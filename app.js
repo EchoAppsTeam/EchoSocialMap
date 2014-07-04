@@ -1,4 +1,5 @@
-// docs: http://leafletjs.com/reference.html
+// SocialMap app uses LeafletJS for map visualization.
+// More info on LeafletJS can be found here: http://leafletjs.com
 (function($) {
 "use strict";
 
@@ -7,16 +8,16 @@ var socialmap = Echo.App.manifest("Echo.Apps.SocialMap");
 if (Echo.App.isDefined(socialmap)) return;
 
 socialmap.vars = {
-	"events": [],   // events queue to maintain up to 50 last seen events
-			// to make a map feel real-time in case of slow incoming
-			// data rate
-
-	"lastSeenEventAt": undefined
+	// events list to maintain a number of last seen events to make
+	// a map feel real-time in case of slow incoming data rate
+	"pins": [],
+	"timeouts": {}
 };
 
 socialmap.config = {
 	"targetURL": undefined,
 	"viewportChangeTimeout": 50,
+	"maxHistoricalPinsQueue": 50,
 	"presentation": {
 		"visualization": "us",
 		"mapColor": "#D8D8D8",
@@ -25,7 +26,9 @@ socialmap.config = {
 		"pinShowSpeed": "100",
 		"pinFadeOutSpeed": "2000",
 		"pinDisplayTime": "5000",
-		"pinDefaultSize": 8 // in px, pin size at 1x map scale
+		"pinDefaultSize": 8, // in px, pin size at 1x map scale
+		"renderHistoricalData": true,
+		"pinsRenderingTimeoutRange": [1, 3] // [min, max] in seconds
 	},
 	"dependencies": {
 		"StreamServer": {
@@ -70,6 +73,17 @@ socialmap.init = function() {
 };
 
 socialmap.destroy = function() {
+	// cleanup pin rendering timeouts
+	var timeouts = this.get("timeouts");
+	$.each(timeouts, function(id) {
+		clearTimeout(id);
+		delete timeouts[id];
+	});
+
+	var map = this.get("map");
+	if (map) {
+		map.remove();
+	}
 	$(window).off("resize", this._viewportResizeHandler);
 };
 
@@ -79,8 +93,10 @@ socialmap.templates.main =
 	'</div>';
 
 socialmap.methods._assembleQuery = function() {
-	return "childrenof:" + this.config.get("targetURL") +
-		" itemsPerPage:50 markers:geo.marker children markers:geo.marker";
+	var query = "childrenof:{config:targetURL} " +
+		"itemsPerPage:{config:maxHistoricalPinsQueue} " +
+		"markers:geo.marker children markers:geo.marker";
+	return this.substitute({"template": query});
 };
 
 socialmap.methods._loadGeoJSON = function(visualization, callback) {
@@ -101,7 +117,7 @@ socialmap.methods._requestData = function() {
 		},
 		"liveUpdates": $.extend(ssConfig.liveUpdates, {
                         "onData": function(data) {
-				app._renderPins(data);
+				app._renderPins(app._extractValidPins(data));
                         }
                 }),
                 "onError": function(data, options) {
@@ -122,7 +138,9 @@ socialmap.methods._requestData = function() {
 			// laid out by the browser. Otherwise it wouldn't have a
 			// width/height yet and Leaflet does NOT like that
 			app._renderMap();
-			app._renderPins(data);
+			if (app.config.get("presentation.renderHistoricalData")) {
+				app._carouselHistoricalPins(app._extractValidPins(data));
+			}
 			app.ready();
 		}
 	});
@@ -170,28 +188,81 @@ socialmap.methods._getMapHeight = function(mapWidth) {
 	return Math.round(mapWidth / (defaultSize[0] / defaultSize[1]));
 };
 
-socialmap.methods._renderPins = function(data) {
-	if (!data.entries || !data.entries.length) return;
-
+socialmap.methods._extractValidPins = function(data) {
 	var app = this;
-
 	// gather valid (with geo data) pins only
-	var pins = Echo.Utils.foldl([], data.entries, function(entry, acc) {
+	return Echo.Utils.foldl([], data.entries || [], function(entry, acc) {
 		var loc = app._extractGeoLocationInfo(entry);
 		if (loc) {
 			acc.push([loc, entry]);
 		}
 	});
+};
 
-	// TODO: work out algorithm to display pins..
-	var cur = 0;
-	var interval = setInterval(function() {
-		var pin = pins[cur];
-		cur++;
-		if (cur > pins.length) clearInterval(interval);
+// TODO: validate this function with a high flow of items...
+socialmap.methods._actualizeHistoricalPins = function(pins) {
+	var max = this.config.get("maxHistoricalPinsQueue");
+	var historicalPins = this.get("pins").concat(pins);
+	if (historicalPins.length > max) {
+		historicalPins.splice(0, historicalPins.length - max);
+	}
+	this.set("pins", historicalPins);
+};
 
-		if (pin) app._renderPin(pin[0], pin[1]);
-	}, 1000);
+socialmap.methods._repeatWithRandomInterval = function(func) {
+	var app = this;
+	var interval = this.config.get("presentation.pinsRenderingTimeoutRange");
+	(function iterate() {
+		var timeout = setTimeout(function() {
+			clearTimeout(timeout);
+			delete app.get("timeouts")[timeout];
+			var stopIterating = func();
+			if (!stopIterating) {
+				iterate();
+			}
+		}, Echo.Utils.random.apply(null, interval) * 1000);
+
+		// keep timeout reference to kill it at "destroy"
+		app.get("timeouts")[timeout] = true;
+	})();
+};
+
+socialmap.methods._carouselHistoricalPins = function(pins) {
+	var app = this;
+	app.set("pins", pins);
+	this._repeatWithRandomInterval(function() {
+		var pins = app.get("pins");
+		// TODO: update the behavior in case a very limited set of
+		//       historical items is present (like 1,2,3 items)...
+		if (pins.length) {
+			var max = app.config.get("maxHistoricalPinsQueue");
+			var id = Echo.Utils.random(1, Math.min(pins.length, max)) - 1;
+			var pin = pins[id];
+			if (pin && pin.length) {
+				app._renderPin(pin[0], pin[1]);
+			}
+		}
+	});
+};
+
+// TODO: validate this function with a high flow of items...
+socialmap.methods._renderPins = function(pins) {
+	if (!pins || !pins.length) return;
+
+	var app = this, idx = 0;
+	if (this.config.get("presentation.renderHistoricalData")) {
+		this._actualizeHistoricalPins(pins);
+	}
+
+	this._repeatWithRandomInterval(function() {
+		var pin = pins[idx];
+		if (pin) {
+			app._renderPin(pin[0], pin[1]);
+		}
+		idx++;
+		return (idx === pins.length);
+	});
+
 };
 
 socialmap.methods._renderPin = function(latlng, entry) {
