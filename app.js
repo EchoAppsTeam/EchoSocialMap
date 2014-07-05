@@ -17,6 +17,8 @@ socialmap.vars = {
 socialmap.config = {
 	"targetURL": undefined,
 	"viewportChangeTimeout": 50,
+	"minHistoricalPinsQueue": 5,    // min queue size to start historical pins
+					// carousel (in case "renderHistoricalData" = true)
 	"maxHistoricalPinsQueue": 50,
 	"presentation": {
 		"visualization": "us",
@@ -117,7 +119,7 @@ socialmap.methods._requestData = function() {
 		},
 		"liveUpdates": $.extend(ssConfig.liveUpdates, {
                         "onData": function(data) {
-				app._renderPins(app._extractValidPins(data));
+				app._renderNewPins(app._extractValidPins(data));
                         }
                 }),
                 "onError": function(data, options) {
@@ -199,7 +201,6 @@ socialmap.methods._extractValidPins = function(data) {
 	});
 };
 
-// TODO: validate this function with a high flow of items...
 socialmap.methods._actualizeHistoricalPins = function(pins) {
 	var max = this.config.get("maxHistoricalPinsQueue");
 	var historicalPins = this.get("pins").concat(pins);
@@ -232,9 +233,7 @@ socialmap.methods._carouselHistoricalPins = function(pins) {
 	app.set("pins", pins);
 	this._repeatWithRandomInterval(function() {
 		var pins = app.get("pins");
-		// TODO: update the behavior in case a very limited set of
-		//       historical items is present (like 1,2,3 items)...
-		if (pins.length) {
+		if (pins.length && pins.length >= app.config.get("minHistoricalPinsQueue")) {
 			var max = app.config.get("maxHistoricalPinsQueue");
 			var id = Echo.Utils.random(1, Math.min(pins.length, max)) - 1;
 			var pin = pins[id];
@@ -245,15 +244,13 @@ socialmap.methods._carouselHistoricalPins = function(pins) {
 	});
 };
 
-// TODO: validate this function with a high flow of items...
-socialmap.methods._renderPins = function(pins) {
+socialmap.methods._renderNewPins = function(pins) {
 	if (!pins || !pins.length) return;
 
 	var app = this, idx = 0;
 	if (this.config.get("presentation.renderHistoricalData")) {
 		this._actualizeHistoricalPins(pins);
 	}
-
 	this._repeatWithRandomInterval(function() {
 		var pin = pins[idx];
 		if (pin) {
@@ -262,7 +259,6 @@ socialmap.methods._renderPins = function(pins) {
 		idx++;
 		return (idx === pins.length);
 	});
-
 };
 
 socialmap.methods._renderPin = function(latlng, entry) {
