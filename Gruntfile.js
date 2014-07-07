@@ -14,27 +14,27 @@ module.exports = function(grunt) {
 
 	grunt.registerTask("default", ["check-environment:" + shared.config("env"), "jshint", "clean:all", "build"]);
 
+	var dirs = {
+		"build": "build",
+		"src": "src",
+		"dest": "web",
+		"dist": "web"
+	};
+
 	var sources = {
 		"js": [
-			"app.js",
-			"dashboard.js"
+			"src/*.js"
 		],
 		"images": [
 			"images/**"
 		],
 		"demo": [
-			"demo.html",
-			"demo.us.html",
-			"demo.world.html"
+			"demo/**"
 		]
 	};
 
 	var config = {
-		"dirs": {
-			"build": "build",
-			"dest": "web",
-			"dist": "web"
-		},
+		"dirs": dirs,
 		"sources": sources,
 		"pkg": grunt.file.readJSON("package.json"),
 		"banner":
@@ -65,10 +65,14 @@ module.exports = function(grunt) {
 		},
 		"copy": {
 			"js": {
+				"expand": true,
+				"cwd": "<%= dirs.src %>",
 				"src": "<%= sources.js %>",
 				"dest": "<%= dirs.build %>/"
 			},
 			"third-party": {
+				"expand": true,
+				"cwd": "<%= dirs.src %>",
 				"src": [
 					"third-party/*.js",
 					"third-party/*.css"
@@ -76,6 +80,8 @@ module.exports = function(grunt) {
 				"dest": "<%= dirs.build %>/"
 			},
 			"images": {
+				"expand": true,
+				"cwd": "<%= dirs.src %>",
 				"src": "<%= sources.images %>",
 				"dest": "<%= dirs.build %>/"
 			},
@@ -136,7 +142,7 @@ module.exports = function(grunt) {
 				"jshintrc": ".jshintrc"
 			},
 			"grunt": ["Gruntfile.js", "grunt/**/*.js"],
-			"sources": ["<%= sources.js %>"]
+			"source": "<%= dirs.src %>/*.js"
 		},
 		"release": {
 			"options": {
