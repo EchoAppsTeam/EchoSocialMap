@@ -109,6 +109,8 @@ socialmap.methods._loadGeoJSON = function(visualization, callback) {
 socialmap.methods._requestData = function() {
 	var app = this;
 	var ssConfig = this.config.get("dependencies.StreamServer");
+	// keep a reference to a request object in "this" to trigger its
+	// automatic sweeping out on Echo.Control level at app destory time
 	this.request = Echo.StreamServer.API.request({
 		"endpoint": "search",
 		"secure": this.config.get("useSecureAPI"),
