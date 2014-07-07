@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 
 	var sources = {
 		"js": [
-			"src/*.js"
+			"*.js"
 		],
 		"images": [
 			"images/**"
