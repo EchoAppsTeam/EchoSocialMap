@@ -118,11 +118,11 @@ socialmap.methods._requestData = function() {
 			"appkey": ssConfig.appkey
 		},
 		"liveUpdates": $.extend(ssConfig.liveUpdates, {
-                        "onData": function(data) {
+			"onData": function(data) {
 				app._renderNewPins(app._extractValidPins(data));
-                        }
-                }),
-                "onError": function(data, options) {
+			}
+		}),
+		"onError": function(data, options) {
 			var isCriticalError =
 				typeof options.critical === "undefined" ||
 				options.critical && options.requestType === "initial";
@@ -354,7 +354,7 @@ socialmap.methods._renderMap = function() {
 		}
 	}).addTo(map);
 
-        app.set("map", map);
+	app.set("map", map);
 };
 
 socialmap.css = '.{class} .{class:map} { width: 100%; min-width: 300px; background: inherit; }';
