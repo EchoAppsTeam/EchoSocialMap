@@ -4,8 +4,15 @@
 		"id": "echo-social-map",
 		"name": "Social Map"
 	},
-	"baseURLs": {
+	"appBaseURLs": {
 		"dev": "//cdn.echoenabled.com/apps/echo/social-map/v{%=packageVersions.stable%}/dev",
 		"prod": "//cdn.echoenabled.com/apps/echo/social-map/v{%=packageVersions.stable%}"
+	},
+	"apiBaseURLs": {
+		"StreamServer": {
+			"basic": "//api.echoenabled.com/v1/",
+			"ws": "//live.echoenabled.com/v1/"
+		},
+		"DataServer": "https://api.dataserver.echoenabled.com/v1/"
 	}
 }

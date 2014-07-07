@@ -40,7 +40,7 @@ dashboard.config.ecl = [{
 			"dataserverBundleName": "Echo Social Map Auto-Generated Bundle for {instanceName}"
 		},
 		"apiBaseURLs": {
-			"DataServer": "https://api.dataserver.echoenabled.com/v1/"
+			"DataServer": "{%= apiBaseURLs.DataServer %}"
 		},
 		"bundle": {
 			"input": {

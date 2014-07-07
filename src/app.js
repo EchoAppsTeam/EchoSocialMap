@@ -35,23 +35,27 @@ socialmap.config = {
 	"dependencies": {
 		"StreamServer": {
 			"appkey": undefined,
-			"apiBaseURL": "//api.echoenabled.com/v1/",
+			"apiBaseURL": "{%= apiBaseURLs.StreamServer.basic %}",
 			"liveUpdates": {
 				"transport": "websockets",
 				"enabled": true,
 				"websockets": {
-					"URL": "//live.echoenabled.com/v1/"
+					"URL": "{%= apiBaseURLs.StreamServer.ws %}"
 				}
 			}
 		}
 	}
 };
 
-socialmap.dependencies = [
-	{"url": "{config:cdnBaseURL.sdk}/api.pack.js", "control": "Echo.StreamServer.API"},
-	{"url": "{%= baseURLs.prod %}/third-party/leaflet.css"},
-	{"url": "{%= baseURLs.prod %}/third-party/leaflet.js"}
-];
+socialmap.dependencies = [{
+	"url": "{config:cdnBaseURL.sdk}/api.pack.js",
+	"control": "Echo.StreamServer.API"
+}, {
+	"url": "{%= appBaseURLs.prod %}/third-party/leaflet.css"
+}, {
+	"url": "{%= appBaseURLs.prod %}/third-party/leaflet.js",
+	"loaded": function() { return !!window.L; }
+}];
 
 socialmap.init = function() {
 	var app = this;
@@ -129,7 +133,7 @@ socialmap.methods._assembleQuery = function() {
 };
 
 socialmap.methods._loadGeoJSON = function(visualization, callback) {
-	var url = "{%= baseURLs.prod %}/third-party/geo." + visualization + ".js";
+	var url = "{%= appBaseURLs.prod %}/third-party/geo." + visualization + ".js";
 	Echo.Loader.download([{"url": url}], callback);
 };
 
