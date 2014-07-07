@@ -70,7 +70,34 @@ socialmap.init = function() {
 	this._loadGeoJSON(map, function() {
 		// save reference to GEO data object
 		app.set("geo", Echo.Variables.GEO[app.config.get("presentation.visualization")]);
-		app._requestData();
+		app._requestData({
+			"onData": function(data, options) {
+				app.render();
+				// we need to wait until the "render" function is executed
+				// for elements to be appended into the DOM tree and be
+				// laid out by the browser. Otherwise it wouldn't have a
+				// width/height yet and Leaflet does NOT like that
+				app._renderMap();
+				if (app.config.get("presentation.renderHistoricalData")) {
+					app._carouselHistoricalPins(app._extractValidPins(data));
+				}
+				app.ready();
+			},
+			"onUpdate": function(data) {
+				app._renderNewPins(app._extractValidPins(data));
+			},
+			"onError": function(data, options) {
+				var isCriticalError =
+					typeof options.critical === "undefined" ||
+					options.critical && options.requestType === "initial";
+
+				if (isCriticalError) {
+					app.showError(data, $.extend(options, {
+						"request": app.request
+					}));
+				}
+			}
+		});
 	});
 };
 
@@ -106,8 +133,7 @@ socialmap.methods._loadGeoJSON = function(visualization, callback) {
 	Echo.Loader.download([{"url": url}], callback);
 };
 
-socialmap.methods._requestData = function() {
-	var app = this;
+socialmap.methods._requestData = function(handlers) {
 	var ssConfig = this.config.get("dependencies.StreamServer");
 	// keep a reference to a request object in "this" to trigger its
 	// automatic sweeping out on Echo.Control level at app destory time
@@ -120,33 +146,10 @@ socialmap.methods._requestData = function() {
 			"appkey": ssConfig.appkey
 		},
 		"liveUpdates": $.extend(ssConfig.liveUpdates, {
-			"onData": function(data) {
-				app._renderNewPins(app._extractValidPins(data));
-			}
+			"onData": handlers.onUpdate
 		}),
-		"onError": function(data, options) {
-			var isCriticalError =
-				typeof options.critical === "undefined" ||
-				options.critical && options.requestType === "initial";
-
-			if (isCriticalError) {
-				app.showError(data, $.extend(options, {
-					"request": app.request
-				}));
-			}
-		},
-		"onData": function(data, options) {
-			app.render();
-			// we need to wait until the "render" function is executed
-			// for elements to be appended into the DOM tree and be
-			// laid out by the browser. Otherwise it wouldn't have a
-			// width/height yet and Leaflet does NOT like that
-			app._renderMap();
-			if (app.config.get("presentation.renderHistoricalData")) {
-				app._carouselHistoricalPins(app._extractValidPins(data));
-			}
-			app.ready();
-		}
+		"onError": handlers.onError,
+		"onData": handlers.onData
 	});
 	this.request.send();
 };
