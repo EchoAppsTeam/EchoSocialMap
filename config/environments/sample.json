@@ -4,8 +4,15 @@
 		"id": "",
 		"name": ""
 	},
-	"baseURLs": {
+	"appBaseURLs": {
 		"dev": "",
 		"prod": ""
+	},
+	"apiBaseURLs": {
+		"StreamServer": {
+			"basic": "",
+			"ws": ""
+		},
+		"DataServer": ""
 	}
 }

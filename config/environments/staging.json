@@ -4,7 +4,7 @@
 		"id": "echo-social-map-staging",
 		"name": "Social Map (Staging)"
 	},
-	"baseURLs": {
+	"appBaseURLs": {
 		"dev": "//echoplatform.com/sandbox/staging/apps/echo/social-map/v{%=packageVersions.stable%}/dev",
 		"prod": "//echoplatform.com/sandbox/staging/apps/echo/social-map/v{%=packageVersions.stable%}"
 	},
