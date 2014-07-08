@@ -44,7 +44,10 @@ dashboard.config.ecl = [{
 		},
 		"bundle": {
 			"input": {
-				"data": {"rules": ['streamserver.add-markers:"geo.location:${geo.longitude};${geo.latitude},geo.marker" | geo']}
+				"data": {"rules": [
+					'include | geo',
+					'streamserver.add-markers:"geo.location:${geo.longitude};${geo.latitude},geo.marker" | geo'
+				]}
 			}
 		}
 	}
