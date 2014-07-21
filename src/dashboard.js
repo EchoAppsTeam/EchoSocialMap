@@ -211,9 +211,12 @@ dashboard.methods._prepareECL = function(items) {
 	var instructions = {
 		"targetURL": function(item) {
 			item.config = $.extend({
-				"instanceName": self.get("data.instance.name"),
+				"bundle": {
+					"url": self.get("data.instance.provisioningDetails.dataServerBundleURL")
+				},
 				"domains": self.get("domains"),
 				"apiToken": self.config.get("dataserverToken"),
+				"instanceName": self.get("data.instance.name"),
 				"valueHandler": function() {
 					return self._assembleTargetURL();
 				}
@@ -281,6 +284,11 @@ dashboard.methods._displayError = function(message) {
 };
 
 dashboard.methods._assembleTargetURL = function() {
+	var provisionedURL = this.get("data.instance.provisioningDetails.targetURL");
+	if (provisionedURL) {
+		return provisionedURL;
+	}
+
 	var re =  new RegExp("\/" + this.get("data.instance.name") + "$");
 	var targetURL = this.get("data.instance.config.targetURL");
 
