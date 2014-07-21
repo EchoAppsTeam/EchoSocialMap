@@ -37,5 +37,13 @@
 			"prod": "{%=appBaseURLs.prod%}/app.js"
 		}
 	},
-	"cloudapp_protocol_version": "1.0.0"
+	"cloudapp_protocol_version": "1.0.0",
+	"endpoints": {
+		"instance/remove": {
+			"url": "http://api.appserver.aboutecho.com/endpoints/dataserver/instance/remove"
+		},
+		"instance/add": {
+			"url": "http://api.appserver.aboutecho.com/endpoints/dataserver/instance/add"
+		}
+	}
 }
