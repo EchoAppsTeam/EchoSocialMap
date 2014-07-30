@@ -1,7 +1,7 @@
 {
 	"id": "{%=manifest.id%}",
 	"name": "{%=manifest.name%}",
-	"description": "Allows you to easily collect chatter from the Social Web and visualize it on a map in real-time.",
+	"description": "Plot social engagement on a Real-time map",
 	"app_version": "{%=packageVersions.stable%}",
 	"icon": "{%=appBaseURLs.prod%}/images/icon.png",
 	"developer": {
