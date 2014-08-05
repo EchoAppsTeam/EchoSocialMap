@@ -25,7 +25,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 # Demo
 
-You can see the demo page of Echo Social Mapp app [here](http://echoappsteam.github.io/EchoSocialMap/).
+You can see the demo page of Echo Social Map app [here](http://echoappsteam.github.io/EchoSocialMap/).
 
 And here is the screenshot:
 
