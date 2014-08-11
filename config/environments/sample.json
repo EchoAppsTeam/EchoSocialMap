@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": 2,
 	"manifest": {
 		"id": "",
 		"name": ""
@@ -14,5 +14,6 @@
 			"ws": ""
 		},
 		"DataServer": ""
-	}
+	},
+	"endpointBaseURL": ""
 }

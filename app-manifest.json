@@ -40,10 +40,10 @@
 	"cloudapp_protocol_version": "1.0.0",
 	"endpoints": {
 		"instance/remove": {
-			"url": "http://api.appserver.aboutecho.com/endpoints/dataserver/instance/remove"
+			"url": "{%=endpointBaseURL%}/instance/remove"
 		},
 		"instance/add": {
-			"url": "http://api.appserver.aboutecho.com/endpoints/dataserver/instance/add"
+			"url": "{%=endpointBaseURL%}/instance/add"
 		}
 	}
 }
