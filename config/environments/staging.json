@@ -10,10 +10,10 @@
 	},
 	"apiBaseURLs": {
 		"StreamServer": {
-			"basic": "//api.dss.ul.js-kit.com/v1/",
-			"ws": "//live.dss.ul.js-kit.com/v1/"
+			"basic": "//api.dss.ul.js-kit.com/v1",
+			"ws": "//live.dss.ul.js-kit.com/v1"
 		},
-		"DataServer": "http://ds0.ul.js-kit.com/api/"
-	},
-	"endpointBaseURL": "//api.staging.aboutecho.com/endpoints/dataserver"
+		"DataServer": "//ds0.ul.js-kit.com/api",
+		"AppServer": "//api.staging.aboutecho.com"
+	}
 }

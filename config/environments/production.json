@@ -10,10 +10,10 @@
 	},
 	"apiBaseURLs": {
 		"StreamServer": {
-			"basic": "//api.echoenabled.com/v1/",
-			"ws": "//live.echoenabled.com/v1/"
+			"basic": "//api.echoenabled.com/v1",
+			"ws": "//live.echoenabled.com/v1"
 		},
-		"DataServer": "https://api.dataserver.echoenabled.com/v1/"
-	},
-	"endpointBaseURL": "//api.appserver.aboutecho.com/endpoints/dataserver"
+		"DataServer": "https://api.dataserver.echoenabled.com/v1",
+		"AppServer": "//api.appserver.aboutecho.com"
+	}
 }

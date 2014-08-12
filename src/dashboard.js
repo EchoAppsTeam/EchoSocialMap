@@ -40,7 +40,7 @@ dashboard.config.ecl = [{
 			"dataserverBundleName": "Echo Social Map Auto-Generated Bundle for {instanceName}"
 		},
 		"apiBaseURLs": {
-			"DataServer": "{%= apiBaseURLs.DataServer %}"
+			"DataServer": "{%= apiBaseURLs.DataServer %}/"
 		},
 		"bundle": {
 			"input": {
@@ -210,9 +210,9 @@ dashboard.methods._prepareECL = function(items) {
 
 	var instructions = {
 		"targetURL": function(item) {
-			item.config = $.extend({
+			item.config = $.extend(true, {
 				"bundle": {
-					"url": self.get("data.instance.provisioningDetails.dataServerBundleURL")
+					"url": self.get("data.instance.provisioningDetails.bundleURL")
 				},
 				"domains": self.get("domains"),
 				"apiToken": self.config.get("dataserverToken"),
@@ -284,19 +284,8 @@ dashboard.methods._displayError = function(message) {
 };
 
 dashboard.methods._assembleTargetURL = function() {
-	var provisionedURL = this.get("data.instance.provisioningDetails.targetURL");
-	if (provisionedURL) {
-		return provisionedURL;
-	}
-
-	var re =  new RegExp("\/" + this.get("data.instance.name") + "$");
-	var targetURL = this.get("data.instance.config.targetURL");
-
-	if (!targetURL || !targetURL.match(re)) {
-		targetURL =  "http://" + this.get("domains")[0] + "/social-source-input/" + this.get("data.instance.name");
-	}
-
-	return targetURL;
+	return this.get("data.instance.config.targetURL")
+		|| this.get("data.instance.provisioningDetails.targetURL");
 };
 
 Echo.AppServer.Dashboard.create(dashboard);

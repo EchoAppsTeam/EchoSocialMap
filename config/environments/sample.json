@@ -13,7 +13,7 @@
 			"basic": "",
 			"ws": ""
 		},
-		"DataServer": ""
-	},
-	"endpointBaseURL": ""
+		"DataServer": "",
+		"AppServer": ""
+	}
 }
