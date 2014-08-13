@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "grunt": "^0.4.5",
-    "cloudapp-boilerplate": "^0.1.0"
+    "cloudapp-boilerplate": "^0.1.1"
   },
   "private": true
 }
