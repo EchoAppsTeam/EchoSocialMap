@@ -16,12 +16,7 @@
 		"type": "instances",
 		"title": "Instances",
 		"script": "{%=appBaseURLs.prod%}/dashboard.js",
-		"component": "Echo.Apps.SocialMap.Dashboard",
-		"config": {
-			"instanceManager": {
-				"instance": {"useLoadingIcon": true}
-			}
-		}
+		"component": "Echo.Apps.SocialMap.Dashboard"
 	}, {
 		"id": "docs",
 		"type": "external",
@@ -37,5 +32,13 @@
 			"prod": "{%=appBaseURLs.prod%}/app.js"
 		}
 	},
-	"cloudapp_protocol_version": "1.0.0"
+	"cloudapp_protocol_version": "1.0.0",
+	"endpoints": {
+		"instance/remove": {
+			"url": "{%=apiBaseURLs.AppServer%}/endpoints/dataserver/instance/remove"
+		},
+		"instance/add": {
+			"url": "{%=apiBaseURLs.AppServer%}/endpoints/dataserver/instance/add"
+		}
+	}
 }

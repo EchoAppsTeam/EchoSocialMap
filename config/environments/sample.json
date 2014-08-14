@@ -1,5 +1,5 @@
 {
-	"version": 1,
+	"version": 2,
 	"manifest": {
 		"id": "",
 		"name": ""
@@ -13,6 +13,7 @@
 			"basic": "",
 			"ws": ""
 		},
-		"DataServer": ""
+		"DataServer": "",
+		"AppServer": ""
 	}
 }
