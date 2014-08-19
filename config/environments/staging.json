@@ -5,8 +5,8 @@
 		"name": "Social Map (Staging)"
 	},
 	"appBaseURLs": {
-		"dev": "//echoplatform.com/sandbox/staging/apps/echo/social-map/v{%=packageVersions.stable%}/dev",
-		"prod": "//echoplatform.com/sandbox/staging/apps/echo/social-map/v{%=packageVersions.stable%}"
+		"dev": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>/dev",
+		"prod": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>"
 	},
 	"apiBaseURLs": {
 		"StreamServer": {

@@ -5,8 +5,8 @@
 		"name": "Social Map"
 	},
 	"appBaseURLs": {
-		"dev": "//cdn.echoenabled.com/apps/echo/social-map/v{%=packageVersions.stable%}/dev",
-		"prod": "//cdn.echoenabled.com/apps/echo/social-map/v{%=packageVersions.stable%}"
+		"dev": "//cdn.echoenabled.com<%= release.options.versionPath() %>/dev",
+		"prod": "//cdn.echoenabled.com<%= release.options.versionPath() %>"
 	},
 	"apiBaseURLs": {
 		"StreamServer": {
