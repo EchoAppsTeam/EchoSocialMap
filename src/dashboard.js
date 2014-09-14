@@ -23,6 +23,10 @@ dashboard.dependencies = [{
 }, {
 	"url": "{config:cdnBaseURL.apps.dataserver}/full.pack.js",
 	"control": "Echo.DataServer.Controls.Pack"
+}, {
+	"url": "{%= appBaseURLs.prod %}/colorpicker.js"
+}, {
+	"url": "{%= appBaseURLs.prod %}/slider.js"
 }];
 
 dashboard.config = {
@@ -75,7 +79,7 @@ dashboard.config.ecl = [{
 			}]
 		}
 	}, {
-		"component": "Input",
+		"component": "Colorpicker",
 		"name": "mapColor",
 		"type": "string",
 		"default": "#D8D8D8",
@@ -84,7 +88,7 @@ dashboard.config.ecl = [{
 			"desc": "Specifies the color of the map"
 		}
 	}, {
-		"component": "Input",
+		"component": "Colorpicker",
 		"name": "pinBodyColor",
 		"type": "string",
 		"default": "#3C3C3C",
@@ -93,7 +97,7 @@ dashboard.config.ecl = [{
 			"desc": "Specifies pin color"
 		}
 	}, {
-		"component": "Input",
+		"component": "Colorpicker",
 		"name": "pinBorderColor",
 		"type": "string",
 		"default": "#3C3C3C",
@@ -102,31 +106,43 @@ dashboard.config.ecl = [{
 			"desc": "Specifies pin border color"
 		}
 	}, {
-		"component": "Input",
+		"component": "Slider",
 		"name": "pinShowSpeed",
 		"type": "string",
 		"default": "100",
 		"config": {
 			"title": "Pin appearance speed",
-			"desc": "Specifies pin appearance animation speed (in milliseconds)"
+			"desc": "Specifies pin appearance animation speed (in milliseconds)",
+			"min": 0,
+			"max": 1000,
+			"step": 100,
+			"unit": "ms"
 		}
 	}, {
-		"component": "Input",
+		"component": "Slider",
 		"name": "pinFadeOutSpeed",
 		"type": "string",
 		"default": "2000",
 		"config": {
 			"title": "Pin removal speed",
-			"desc": "Specifies pin removal animation speed (in milliseconds)"
+			"desc": "Specifies pin removal animation speed (in milliseconds)",
+			"min": 0,
+			"max": 3000,
+			"step": 100,
+			"unit": "ms"
 		}
 	}, {
-		"component": "Input",
+		"component": "Slider",
 		"name": "pinDisplayTime",
 		"type": "string",
 		"default": "5000",
 		"config": {
 			"title": "Pin display duration",
-			"desc": "Specifies the time which the pin remains on the map (in milliseconds)"
+			"desc": "Specifies the time which the pin remains on the map (in milliseconds)",
+			"min": 0,
+			"max": 10000,
+			"step": 1000,
+			"unit": "ms"
 		}
 	}, {
 		"component": "Checkbox",
