@@ -51,7 +51,7 @@ colorpicker.templates.picker =
 colorpicker.renderers.colorpicker = function(element) {
 	var item = this;
    
-	// we can not react on every slider change, since it might produce
+	// we can not react on every color picker change, since it might produce
 	// a lot of load on a server and slow down the client side performance,
 	// so we debounce actual value application, while keeping visual value
 	// representation updates in UI instant
