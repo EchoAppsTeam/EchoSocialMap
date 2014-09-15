@@ -75,7 +75,7 @@ slider.methods._isSliderSupported = function() {
 };
 
 slider.css =
-	'.{class:container} div.{class:value} { float: left; width: 35%; padding-right: 5px; font-size: 12px; color: #333; line-height: 36px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }' +
+	'.{class:container} div.{class:value} { float: left; width: 35%; padding-right: 5px; font-size: 12px; color: #333; line-height: 36px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; box-sizing: border-box; }' +
 	'.{class:container} input[type="range"].{class:slider} { float: left; width: 60%; margin: 11px 0px 0px 0px; }';
 
 Echo.AppServer.App.create(slider);
