@@ -7,10 +7,6 @@ var dashboard = Echo.AppServer.Dashboard.manifest("Echo.Apps.SocialMap.Dashboard
 
 dashboard.inherits = Echo.Utils.getComponent("Echo.AppServer.Dashboards.AppSettings");
 
-dashboard.labels = {
-	"failedToFetchToken": "Failed to fetch customer DataServer token: {reason}"
-};
-
 dashboard.mappings = {
 	"dependencies.appkey": {
 		"key": "dependencies.StreamServer.appkey"
@@ -28,10 +24,6 @@ dashboard.dependencies = [{
 }, {
 	"url": "{%= appBaseURLs.prod %}/slider.js"
 }];
-
-dashboard.config = {
-	"appkeys": []
-};
 
 dashboard.config.ecl = [{
 	"name": "targetURL",
@@ -175,134 +167,33 @@ dashboard.config.ecl = [{
 }];
 
 dashboard.init = function() {
-	var self = this, parent = $.proxy(this.parent, this);
-	this._fetchDataServerToken(function() {
-		self._requestData(function() {
-			self.config.set("ecl", self._prepareECL(self.config.get("ecl")));
-			parent();
-		});
-	});
+	this.parent();
+};
+
+dashboard.modifiers = {
+	"dependencies.appkey": {
+		"endpoint": "customer/{self:user.getCustomerId}/appkeys",
+		"processor": function() {
+			return this.getAppkey.apply(this, arguments);
+		}
+	},
+	"targetURL": {
+		"endpoint": "customer/{self:user.getCustomerId}/subscriptions",
+		"processor": function() {
+			return this.getBundleTargetURL.apply(this, arguments);
+		}
+	}
 };
 
 dashboard.methods.declareInitialConfig = function() {
-	var keys = this.get("appkeys", []);
 	return {
-		"targetURL": this._assembleTargetURL(),
+		"targetURL": this.assembleTargetURL(),
 		"dependencies": {
 			"StreamServer": {
-				"appkey": keys.length ? keys[0].key : undefined
+				"appkey": this.getDefaultAppKey()
 			}
 		}
 	};
-};
-
-dashboard.methods._requestData = function(callback) {
-	var self = this;
-	var customerId = this.config.get("data.customer.id");
-	var deferreds = [];
-	var request = this.config.get("request");
-
-	var requests = [{
-		"name": "appkeys",
-		"endpoint": "customer/" + customerId + "/appkeys"
-	}, {
-		"name": "domains",
-		"endpoint": "customer/" + customerId + "/domains"
-	}];
-	$.map(requests, function(req) {
-		var deferredId = deferreds.push($.Deferred()) - 1;
-		request({
-			"endpoint": req.endpoint,
-			"success": function(response) {
-				self.set(req.name, response);
-				deferreds[deferredId].resolve();
-			}
-		});
-	});
-	$.when.apply($, deferreds).done(callback);
-};
-
-dashboard.methods._prepareECL = function(items) {
-	var self = this;
-
-	var instructions = {
-		"targetURL": function(item) {
-			item.config = $.extend(true, {
-				"bundle": {
-					"url": self.get("data.instance.provisioningDetails.bundleURL")
-				},
-				"domains": self.get("domains"),
-				"apiToken": self.config.get("dataserverToken"),
-				"instanceName": self.get("data.instance.name"),
-				"valueHandler": function() {
-					return self._assembleTargetURL();
-				}
-			}, item.config);
-			return item;
-		},
-		"dependencies.appkey": function(item) {
-			item.config.options = $.map(self.get("appkeys"), function(appkey) {
-				return {
-					"title": appkey.key,
-					"value": appkey.key
-				};
-			});
-			return item;
-		}
-	};
-	return (function traverse(items, path) {
-		return $.map(items, function(item) {
-			var _path = path ? path + "." + item.name : item.name;
-			if (item.type === "object" && item.items) {
-				item.items = traverse(item.items, _path);
-			} else if (instructions[_path]) {
-				item = instructions[_path](item);
-			}
-			return item;
-		});
-	})(items, "");
-};
-
-dashboard.methods._fetchDataServerToken = function(callback) {
-	var self = this;
-	Echo.AppServer.API.request({
-		"endpoint": "customer/{id}/subscriptions",
-		"id": this.get("data.customer").id,
-		"onData": function(response) {
-			var token = Echo.Utils.foldl("", response, function(subscription, acc) {
-				return subscription.product.name === "dataserver"
-					? subscription.extra.token
-					: acc;
-			});
-			if (token) {
-				self.config.set("dataserverToken", token);
-				callback.call(self);
-			} else {
-				self._displayError(
-					self.labels.get("failedToFetchToken", {
-						"reason": self.labels.get("dataserverSubscriptionNotFound")
-					})
-				);
-			}
-		},
-		"onError": function(response) {
-			self._displayError(self.labels.get("failedToFetchToken", {"reason": response.data.msg}));
-		}
-	}).send();
-};
-
-dashboard.methods._displayError = function(message) {
-	this.showMessage({
-		"type": "error",
-		"message": message,
-		"target": this.config.get("target")
-	});
-	this.ready();
-};
-
-dashboard.methods._assembleTargetURL = function() {
-	return this.get("data.instance.config.targetURL")
-		|| this.get("data.instance.provisioningDetails.targetURL");
 };
 
 Echo.AppServer.Dashboard.create(dashboard);
