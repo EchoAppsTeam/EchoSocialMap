@@ -31,7 +31,7 @@ slider.templates.slider =
 			'<div class="{inherited.class:headerPane} {class:headerPane} clearfix">' +
 				'<div class="{inherited.class:valueContainer} {class:valueContainer}">' +
 					'<div class="{inherited.class:link} {class:link} pull-right"></div>' +
-					'<div class="{class:value}"></div>' +
+					'<div class="{class:displayValue}"></div>' +
 					'<input class="{class:slider}" type="range" value="{data:value}" min="{config:min}" max="{config:max}" step="{config:step}" />' +
 					'<div class="echo-clear"></div>' +
 				'</div>' +
@@ -43,7 +43,7 @@ slider.templates.slider =
 	'</div>';
 
 
-slider.renderers.value = function(element, extra) {
+slider.renderers.displayValue = function(element, extra) {
 	extra = extra || {};
 	return element.text((extra.value || this.get("data.value")) + " " + this.config.get("unit"));
 };
@@ -61,7 +61,7 @@ slider.renderers.slider = function(element) {
 
 	return element.off("input").on("input", function() {
 		setValueDebounced();
-		item.view.render({"name": "value", "extra": {"value": element.val()}});
+		item.view.render({"name": "displayValue", "extra": {"value": element.val()}});
 	});
 };
 
@@ -75,7 +75,7 @@ slider.methods._isSliderSupported = function() {
 };
 
 slider.css =
-	'.{class:container} div.{class:value} { float: left; width: 35%; padding-right: 5px; font-size: 12px; color: #333; line-height: 36px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; box-sizing: border-box; }' +
+	'.{class:container} div.{class:displayValue} { float: left; width: 35%; padding-right: 5px; font-size: 12px; color: #333; line-height: 36px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; box-sizing: border-box; }' +
 	'.{class:container} input[type="range"].{class:slider} { float: left; width: 60%; margin: 11px 0px 0px 0px; }';
 
 Echo.AppServer.App.create(slider);
