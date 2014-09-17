@@ -22,7 +22,9 @@ colorpicker.labels = {
 // by the parent "Input" class.
 colorpicker.events = {
 	"Echo.AppServer.Controls.Configurator.Item.onChange": function() {
-		this.view.get("colorpicker").val(this.get("data.value"));
+		if (this._isColorpickerSupported()) {
+			this.view.get("colorpicker").val(this.get("data.value"));
+		}
 	}
 };
 
