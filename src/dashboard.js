@@ -38,13 +38,9 @@ dashboard.config.ecl = [{
 		"apiBaseURLs": {
 			"DataServer": "{%= apiBaseURLs.DataServer %}/"
 		},
-		"bundle": {
-			"input": {
-				"data": {"rules": [
-					'include | geo',
-					'streamserver.add-markers:"geo.location:${geo.longitude};${geo.latitude},geo.marker" | geo'
-				]}
-			}
+		"rules": {
+			"include": ["geo"],
+			"streamserver.add-markers:\"geo.location:${geo.longitude};${geo.latitude},geo.marker\"": ["geo"]
 		}
 	}
 }, {
