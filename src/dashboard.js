@@ -182,17 +182,6 @@ dashboard.modifiers = {
 	}
 };
 
-dashboard.methods.declareInitialConfig = function() {
-	return {
-		"targetURL": this.assembleTargetURL(),
-		"dependencies": {
-			"StreamServer": {
-				"appkey": this.getDefaultAppKey()
-			}
-		}
-	};
-};
-
 Echo.AppServer.Dashboard.create(dashboard);
 
 })(Echo.jQuery);

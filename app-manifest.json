@@ -33,12 +33,5 @@
 		}
 	},
 	"cloudapp_protocol_version": "1.0.0",
-	"endpoints": {
-		"instance/remove": {
-			"url": "{%=apiBaseURLs.AppServer%}/endpoints/dataserver/instance/remove"
-		},
-		"instance/add": {
-			"url": "{%=apiBaseURLs.AppServer%}/endpoints/dataserver/instance/add"
-		}
-	}
+	"dependencies": ["StreamServer", "DataServer"]
 }
