@@ -14,6 +14,10 @@ socialmap.vars = {
 	"timeouts": {}
 };
 
+socialmap.labels = {
+	"noData": "No data yet.<br>Stay tuned!"
+};
+
 socialmap.config = {
 	"targetURL": undefined,
 	"viewportChangeTimeout": 50,
@@ -72,23 +76,43 @@ socialmap.init = function() {
 
 	var map = this.config.get("presentation.visualization");
 	this._loadGeoJSON(map, function() {
+		var presentation = app.config.get("presentation");
 		// save reference to GEO data object
-		app.set("geo", Echo.Variables.GEO[app.config.get("presentation.visualization")]);
+		app.set("geo", Echo.Variables.GEO[presentation.visualization]);
 		app._requestData({
 			"onData": function(data, options) {
+				var includeHistoricalPins = presentation.renderHistoricalData;
+				if (includeHistoricalPins) {
+					app.set("pins", app._extractValidPins(data));
+				}
+
 				app.render();
+
 				// we need to wait until the "render" function is executed
 				// for elements to be appended into the DOM tree and be
 				// laid out by the browser. Otherwise it wouldn't have a
 				// width/height yet and Leaflet does NOT like that
-				app._renderMap();
-				if (app.config.get("presentation.renderHistoricalData")) {
-					app._carouselHistoricalPins(app._extractValidPins(data));
+				if (app._hasData()) {
+					app._renderMap();
+				}
+
+				if (includeHistoricalPins) {
+					app._carouselHistoricalPins(app.get("pins"));
 				}
 				app.ready();
 			},
 			"onUpdate": function(data) {
-				app._renderNewPins(app._extractValidPins(data));
+				var pins = app._extractValidPins(data);
+				if (!pins || !pins.length) return;
+
+				if (!app._hasData()) {
+					app.set("pins", pins);
+					app.render();
+					app._renderMap();
+				} else if (app.config.get("presentation.renderHistoricalData")) {
+					app._actualizeHistoricalPins(pins);
+				}
+				app._renderNewPins(app.get("pins"));
 			},
 			"onError": function(data, options) {
 				var isCriticalError =
@@ -120,10 +144,23 @@ socialmap.destroy = function() {
 	$(window).off("resize", this._viewportResizeHandler);
 };
 
+socialmap.methods.template = function() {
+	return this.templates[this._hasData() ? "main" : "empty"];
+};
+
 socialmap.templates.main =
 	'<div class="{class:container}">' +
 		'<div class="{class:map}"></div>' +
 	'</div>';
+
+socialmap.templates.empty =
+	'<div class="{class:empty}">' +
+		'<span class="{class:message}">{label:noData}</span>' +
+	'</div>';
+
+socialmap.methods._hasData = function() {
+	return !!this.get("pins", []).length;
+};
 
 socialmap.methods._assembleQuery = function() {
 	var query = "childrenof:{config:targetURL} " +
@@ -239,7 +276,6 @@ socialmap.methods._repeatWithRandomInterval = function(func) {
 
 socialmap.methods._carouselHistoricalPins = function(pins) {
 	var app = this;
-	app.set("pins", pins);
 	this._repeatWithRandomInterval(function() {
 		var pins = app.get("pins");
 		if (pins.length && pins.length >= app.config.get("minHistoricalPinsQueue")) {
@@ -257,9 +293,6 @@ socialmap.methods._renderNewPins = function(pins) {
 	if (!pins || !pins.length) return;
 
 	var app = this, idx = 0;
-	if (this.config.get("presentation.renderHistoricalData")) {
-		this._actualizeHistoricalPins(pins);
-	}
 	this._repeatWithRandomInterval(function() {
 		var pin = pins[idx];
 		if (pin) {
@@ -366,7 +399,10 @@ socialmap.methods._renderMap = function() {
 	app.set("map", map);
 };
 
-socialmap.css = '.{class} .{class:map} { width: 100%; min-width: 300px; background: inherit; }';
+socialmap.css =
+	'.{class} .{class:map} { width: 100%; min-width: 300px; background: inherit; }' +
+	'.{class:empty} { border: 1px solid #d2d2d2; background-color: #fff; margin: 0 5px 10px 5px; padding: 30px 20px; text-align: center; }' +
+	'.{class:empty} .{class:message} { background: url("//cdn.echoenabled.com/apps/echo/conversations/v2/sdk-derived/images/info.png") no-repeat; margin: 0 auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, "Open Sans", sans-serif; padding-left: 40px; display: inline-block; text-align: left; line-height: 16px; color: #7f7f7f; }';
 
 Echo.App.create(socialmap);
 
