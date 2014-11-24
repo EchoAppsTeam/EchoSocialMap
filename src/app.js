@@ -401,8 +401,8 @@ socialmap.methods._renderMap = function() {
 
 socialmap.css =
 	'.{class} .{class:map} { width: 100%; min-width: 300px; background: inherit; }' +
-	'.{class:empty} { border: 1px solid #d2d2d2; background-color: #fff; margin: 0 5px 10px 5px; padding: 30px 20px; text-align: center; }' +
-	'.{class:empty} .{class:message} { background: url("//cdn.echoenabled.com/apps/echo/conversations/v2/sdk-derived/images/info.png") no-repeat; margin: 0 auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, "Open Sans", sans-serif; padding-left: 40px; display: inline-block; text-align: left; line-height: 16px; color: #7f7f7f; }';
+	'.{class:empty} { border: 1px solid #d2d2d2; background-color: #fff; margin: 0px; margin-bottom: 10px; padding: 30px 20px; text-align: center; }' +
+	'.{class:empty} .{class:message} { background: url("//cdn.echoenabled.com/apps/echo/conversations/v2/sdk-derived/images/info.png") no-repeat; margin: 0 auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, "Open Sans", sans-serif; padding-left: 40px; display: inline-block; text-align: left; line-height: 16px; color: #7f7f7f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; box-sizing: border-box; }';
 
 Echo.App.create(socialmap);
 
