@@ -14,6 +14,6 @@
 			"ws": "//live.echoenabled.com/v1"
 		},
 		"DataServer": "https://api.dataserver.echoenabled.com/v1",
-		"AppServer": "http://api.appserver.aboutecho.com"
+		"AppServer": "http://api.echostudio.co"
 	}
 }

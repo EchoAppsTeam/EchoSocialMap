@@ -1,19 +1,19 @@
 {
 	"version": 2,
 	"manifest": {
-		"id": "echo-social-map-staging",
-		"name": "Map (Staging)"
+		"id": "echo-social-map",
+		"name": "Map"
 	},
 	"appBaseURLs": {
-		"dev": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>/dev",
-		"prod": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>"
+		"dev": "//cdn.echoplatform.com<%= release.options.versionPath() %>/dev",
+		"prod": "//cdn.echoplatform.com<%= release.options.versionPath() %>"
 	},
 	"apiBaseURLs": {
 		"StreamServer": {
-			"basic": "//api.dss.ul.js-kit.com/v1",
-			"ws": "//live.dss.ul.js-kit.com/v1"
+			"basic": "//api.ss.ul.js-kit.com/v1",
+			"ws": "//live.ss.ul.js-kit.com/v1"
 		},
 		"DataServer": "//ds0.ul.js-kit.com/api",
-		"AppServer": "http://api.staging.appserver.aboutecho.com"
+		"AppServer": "http://api.staging.echostudio.co"
 	}
 }
