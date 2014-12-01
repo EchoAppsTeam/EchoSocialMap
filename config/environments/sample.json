@@ -1,9 +1,5 @@
 {
-	"version": 2,
-	"manifest": {
-		"id": "",
-		"name": ""
-	},
+	"version": 3,
 	"appBaseURLs": {
 		"dev": "",
 		"prod": ""
