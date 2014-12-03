@@ -17,7 +17,7 @@ dashboard.dependencies = [{
 	"url": "{config:cdnBaseURL.apps.appserver}/controls/configurator.js",
 	"control": "Echo.AppServer.Controls.Configurator"
 }, {
-	"url": "{config:cdnBaseURL.apps.dataserver}/full.pack.js",
+	"url": "{config:cdnBaseURL.apps.dataserver}/dashboards.pack.js",
 	"control": "Echo.DataServer.Controls.Pack"
 }, {
 	"url": "{%= appBaseURLs.prod %}/colorpicker.js"
