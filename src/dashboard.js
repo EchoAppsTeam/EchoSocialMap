@@ -105,12 +105,12 @@ dashboard.config.ecl = [{
 		"component": "Slider",
 		"name": "pinDisplayTime",
 		"type": "string",
-		"default": "5000",
+		"default": "7000",
 		"config": {
 			"title": "Pin display duration",
 			"desc": "Specifies the time which the pin remains on the map (in milliseconds)",
 			"min": 0,
-			"max": 10000,
+			"max": 12000,
 			"step": 1000,
 			"unit": "ms"
 		}

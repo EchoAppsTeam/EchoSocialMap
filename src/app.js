@@ -31,7 +31,7 @@ socialmap.config = {
 		"pinBorderColor": "#3C3C3C",
 		"pinShowSpeed": "100",
 		"pinFadeOutSpeed": "2000",
-		"pinDisplayTime": "5000",
+		"pinDisplayTime": "7000",
 		"pinDefaultSize": 8, // in px, pin size at 1x map scale
 		"renderHistoricalData": true,
 		"pinsRenderingTimeoutRange": [1, 3] // [min, max] in seconds
