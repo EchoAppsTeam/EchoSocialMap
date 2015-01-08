@@ -9,7 +9,7 @@
 			"basic": "//api.ss.ul.js-kit.com/v1",
 			"ws": "//live.ss.ul.js-kit.com/v1"
 		},
-		"DataServer": "//ds0.ul.js-kit.com/api",
+		"DataServer": "//staging.dataserver.echoenabled.com/api",
 		"AppServer": "http://api.staging.echostudio.co"
 	}
 }
