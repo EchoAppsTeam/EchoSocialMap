@@ -23,8 +23,8 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "grunt": "^0.4.5",
-    "cloudapp-boilerplate": "^0.3.0"
+    "cloudapp-boilerplate": "^0.4.0",
+    "grunt": "^0.4.5"
   },
   "private": true
 }
